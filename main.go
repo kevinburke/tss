@@ -11,6 +11,15 @@ import (
 	tss "github.com/kevinburke/tss/lib"
 )
 
+func init() {
+	flag.Usage = func() {
+		fmt.Fprintf(os.Stderr, `tss [-v] [-h]
+
+Annotate stdin with timestamps per line.
+`)
+	}
+}
+
 const Version = "0.2"
 
 func main() {
