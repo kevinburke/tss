@@ -38,8 +38,5 @@ func CopyTime(w io.Writer, r io.Reader, start time.Time) (written int64, err err
 		buf.Reset()
 		lastLine = gotLine
 	}
-	if err := bs.Err(); err != nil {
-		return n, err
-	}
-	return n, nil
+	return n, bs.Err()
 }
