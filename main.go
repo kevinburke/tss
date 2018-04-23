@@ -11,7 +11,7 @@ import (
 	tss "github.com/kevinburke/tss/lib"
 )
 
-const Version = "0.1"
+const Version = "0.2"
 
 func main() {
 	version := flag.Bool("version", false, "Print the version string")
