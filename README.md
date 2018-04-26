@@ -20,7 +20,7 @@ line printed.
 Find your target operating system (darwin, windows, linux) and desired bin
 directory, and modify the command below as appropriate:
 
-    curl --silent --location --output=/usr/local/bin/tss https://github.com/kevinburke/tss/releases/download/0.3/tss-linux-amd64 && chmod 755 /usr/local/bin/tss
+    curl --silent --location --output=/usr/local/bin/tss https://github.com/kevinburke/tss/releases/download/0.2/tss-linux-amd64 && chmod 755 /usr/local/bin/tss
 
 The latest version is 0.3.
 
