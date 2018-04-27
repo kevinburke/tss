@@ -17,7 +17,7 @@ line printed.
 
 ## Installation
 
-Find your target operating system (darwin, windows, linux) and desired bin
+[Find your target operating system](https://github.com/kevinburke/tss/releases) (darwin, windows, linux) and desired bin
 directory, and modify the command below as appropriate:
 
     curl --silent --location --output=/usr/local/bin/tss https://github.com/kevinburke/tss/releases/download/0.3/tss-linux-amd64 && chmod 755 /usr/local/bin/tss
