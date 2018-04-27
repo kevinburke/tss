@@ -9,14 +9,8 @@ import (
 	"time"
 )
 
-// A Scaler is a function that scales and formats a measurement.
-// All measurements within a given table row are formatted
-// using the same scaler, so that the units are consistent
-// across the row.
-//
-// Lifted from golang.org/x/perf/benchstat.
-type scaler func(float64) string
-
+// TimeScaler returns a format string for the given Duration where all of the
+// decimals will line up in the same column (fourth from the end).
 func TimeScaler(d time.Duration) string {
 	switch {
 	case d == 0:
