@@ -26,24 +26,57 @@ func (s *sleepReader) Read(p []byte) (int, error) {
 		return 6, nil
 	}
 	time.Sleep(s.sleepFor)
+	if s.count == 2 {
+		copy(p[:3], "hel")
+		return 3, nil
+	}
+	if s.count == 3 {
+		copy(p[:3], "lo\n")
+		return 3, nil
+	}
+	if s.count == 4 {
+		copy(p[:15], "hello\nhello\nhel")
+		return 15, nil
+	}
+	if s.count == 5 {
+		copy(p[:3], "lo\n")
+		return 3, nil
+	}
 	copy(p[:6], "hello\n")
 	return 6, nil
 }
 
+func TestWriter(t *testing.T) {
+	t.Parallel()
+	max := 6
+	s := &sleepReader{max: max, sleepFor: 2 * time.Millisecond}
+	buf := new(bytes.Buffer)
+	w := tss.NewWriter(buf, time.Time{})
+	n, err := io.Copy(w, s)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if int(n) != len("hello\n")*max {
+		t.Errorf("expected n of 36, got %d:\n%s", n, buf)
+	}
+}
+
 func TestCopy(t *testing.T) {
 	t.Parallel()
-	s := &sleepReader{max: 3, sleepFor: 5 * time.Millisecond}
+	max := 6
+	s := &sleepReader{max: max, sleepFor: 2 * time.Millisecond}
 	buf := new(bytes.Buffer)
 	n, err := tss.Copy(buf, s)
-	if n != 72 {
-		t.Errorf("expected n of 72, got %d", n)
-	}
+	want := len("hello\n") * 6
 	if err != nil {
 		t.Errorf("expected nil error, got %v", err)
 	}
+	if int(n) != want {
+		t.Errorf("expected n of %d, got %d", want, n)
+	}
 	parts := strings.Split(buf.String(), "\n")
-	if len(parts) != 4 {
-		t.Errorf("incorrect number of parts: want 4 got %q", parts)
+	if len(parts) != 7 {
+		t.Errorf("incorrect number of parts: want 6 got %d:\n%q", len(parts), parts)
 	}
 	line1 := parts[0]
 	if len(line1) != 23 {
@@ -91,17 +124,38 @@ func TestTimeScaler(t *testing.T) {
 }
 
 func BenchmarkCopy(b *testing.B) {
-	bs := bytes.Repeat([]byte{'a'}, 512+1)
-	for i := 0; i < len(bs); i += 40 {
+	bs := bytes.Repeat([]byte{'a'}, 2<<12+1)
+	for i := 0; i < len(bs); i += 50 {
 		bs[i] = '\n'
 	}
+	b.SetBytes(int64(len(bs)))
 	rd := bytes.NewReader(bs)
 	buf := new(bytes.Buffer)
 	b.ReportAllocs()
 	b.ResetTimer()
 
 	for i := 0; i < b.N; i++ {
-		tss.Copy(buf, rd)
+		tss.CopyTime(buf, rd, time.Now().Add(-50*time.Millisecond))
+		buf.Reset()
+		rd.Reset(bs)
+	}
+}
+
+func BenchmarkWriter(b *testing.B) {
+	bs := bytes.Repeat([]byte{'a'}, 2<<12)
+	for i := 0; i < len(bs); i += 50 {
+		bs[i] = '\n'
+	}
+	b.SetBytes(int64(len(bs)))
+	rd := bytes.NewReader(bs)
+	buf := new(bytes.Buffer)
+	w := tss.NewWriter(buf, time.Now().Add(-50*time.Millisecond))
+	b.ReportAllocs()
+	b.ResetTimer()
+
+	for i := 0; i < b.N; i++ {
+		io.Copy(w, rd)
+		buf.Reset()
 		rd.Reset(bs)
 	}
 }
