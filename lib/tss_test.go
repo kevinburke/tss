@@ -66,6 +66,30 @@ func TestCopy(t *testing.T) {
 	}
 }
 
+var scalerTests = []struct {
+	in  time.Duration
+	out string
+}{
+	{100 * time.Microsecond, "0.1ms"},
+	{500 * time.Microsecond, "0.5ms"},
+	{99 * time.Microsecond, "0.1ms"},
+	{49 * time.Microsecond, "49.0µs"},
+	{time.Millisecond, "1.0ms"},
+	{56*time.Millisecond + 290*time.Microsecond, "56.3ms"},
+	{56*time.Millisecond + 251*time.Microsecond, "56.3ms"},
+	{56*time.Millisecond + 100*time.Microsecond, "56.1ms"},
+	{0, "0.0ms"},
+}
+
+func TestTimeScaler(t *testing.T) {
+	for _, tt := range scalerTests {
+		v := tss.TimeScaler(tt.in)
+		if v != tt.out {
+			t.Errorf("timeScaler(%q): want %q, got %q", tt.in, tt.out, v)
+		}
+	}
+}
+
 func BenchmarkCopy(b *testing.B) {
 	bs := bytes.Repeat([]byte{'a'}, 512+1)
 	for i := 0; i < len(bs); i += 40 {
