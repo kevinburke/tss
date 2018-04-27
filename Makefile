@@ -4,6 +4,7 @@ BENCHSTAT := $(GOPATH)/bin/benchstat
 BUMP_VERSION := $(GOPATH)/bin/bump_version
 MEGACHECK := $(GOPATH)/bin/megacheck
 RELEASE := $(GOPATH)/bin/github-release
+WRITE_MAILMAP := $(GOPATH)/bin/write_mailmap
 UNAME = $(shell uname -s)
 
 test:
@@ -59,3 +60,8 @@ endif
 	$(RELEASE) upload --user kevinburke --repo tss --tag $(version) --name tss-linux-amd64 --file releases/$(version)/tss-linux-amd64 || true
 	$(RELEASE) upload --user kevinburke --repo tss --tag $(version) --name tss-darwin-amd64 --file releases/$(version)/tss-darwin-amd64 || true
 	$(RELEASE) upload --user kevinburke --repo tss --tag $(version) --name tss-windows-amd64 --file releases/$(version)/tss-windows-amd64 || true
+
+AUTHORS.txt: | $(WRITE_MAILMAP)
+	$(WRITE_MAILMAP) > AUTHORS.txt
+
+authors: AUTHORS.txt
