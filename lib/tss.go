@@ -34,7 +34,6 @@ func (w *Writer) Write(p []byte) (int, error) {
 	wrote := 0
 	now := time.Now()
 	pos := 0
-	var sbuf [9]byte
 	for {
 		// write everything up to the next newline
 		if w.endOfLine {
@@ -43,7 +42,6 @@ func (w *Writer) Write(p []byte) (int, error) {
 			s := TimeScaler(sinceStart)
 			for i := 0; i < 8-len(s); i++ {
 				w.buf.WriteByte(' ')
-				sbuf[i] = ' '
 			}
 			w.buf.WriteString(s)
 			w.buf.WriteByte(' ')
@@ -67,6 +65,7 @@ func (w *Writer) Write(p []byte) (int, error) {
 			wrote += idx + 1
 			pos += idx + 1
 			w.endOfLine = true
+			w.lastLine = now
 			if pos >= len(p) {
 				break
 			}
