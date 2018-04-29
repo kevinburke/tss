@@ -31,6 +31,8 @@ func (w *Writer) Write(p []byte) (int, error) {
 	if len(p) == 0 {
 		return 0, nil
 	}
+	w.buf.Reset()
+	w.buf.Grow(len(p) + bytes.Count(p, []byte{'\n'})*len(padding))
 	wrote := 0
 	now := time.Now()
 	pos := 0
@@ -76,7 +78,6 @@ func (w *Writer) Write(p []byte) (int, error) {
 		}
 	}
 	_, err := w.w.Write(w.buf.Bytes())
-	w.buf.Reset()
 	return wrote, err
 }
 
