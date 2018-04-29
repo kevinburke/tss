@@ -31,3 +31,31 @@ If you have a Go development environment, you can also install via source code:
 The corresponding library is available at
 `github.com/kevinburke/tss/lib`. View the library documentation at
 [godoc.org](https://godoc.org/github.com/kevinburke/tss/lib).
+
+## Usage Notes
+
+- Piping commands to `tss` may result in programs buffering their output before
+flushing it to stdout file descriptor. You can avoid this by wrapping the target
+program in a command like `unbuffer` (via [the expect package][expect]) or
+[`stdbuf` from the coreutils package][stdbuf]. On Macs you can install with
+`brew install expect` and `brew install coreutils` respectively; the stdbuf
+command may be prefixed with a 'g': `gstdbuf`.
+
+    ```
+    stdbuf --output=L <mycommand> | tss
+    ```
+
+- Piping commands may also change the return code from non-zero to zero, since
+Bash by default uses the return code of the last command in the pipe to decide
+how to exit. This means if you are piping output to `tss` or `ts` you may
+accidentally change a failing program to a passing one. Use `set -o pipefail` in
+Bash scripts to ensure that Bash will return a non-zero return code if any part
+of a pipe operation fails. Or add this to a Makefile:
+
+    ```
+    SHELL = /bin/bash -o pipefail
+    ```
+
+
+[expect]: http://expect.sourceforge.net/example/unbuffer.man.html
+[stdbuf]: https://www.gnu.org/software/coreutils/manual/html_node/stdbuf-invocation.html
