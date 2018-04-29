@@ -80,9 +80,14 @@ func (w *Writer) Write(p []byte) (int, error) {
 	return wrote, err
 }
 
+var forceNonZeroTestVal = time.Duration(0)
+
 // TimeScaler returns a format string for the given Duration where all of the
 // decimals will line up in the same column (fourth from the end).
 func TimeScaler(d time.Duration) string {
+	if d == 0 && forceNonZeroTestVal != 0 {
+		d = forceNonZeroTestVal
+	}
 	switch {
 	case d == 0:
 		return "0.0ms"
