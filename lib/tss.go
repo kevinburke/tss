@@ -2,6 +2,7 @@ package tss
 
 import (
 	"bytes"
+	"fmt"
 	"io"
 	"strconv"
 	"time"
@@ -92,6 +93,11 @@ func TimeScaler(d time.Duration) string {
 	switch {
 	case d == 0:
 		return "0.0ms"
+	case d >= time.Minute:
+		mins := d / time.Minute
+		d = d - mins*time.Minute
+		s := strconv.FormatFloat(float64(d.Nanoseconds())/1e9, 'f', 0, 64)
+		return strconv.Itoa(int(mins)) + "m" + fmt.Sprintf("%02s", s) + "s"
 	case d >= time.Second:
 		return strconv.FormatFloat(float64(d.Nanoseconds())/1e9, 'f', 2, 64) + "s"
 	case d >= 50*time.Microsecond:
