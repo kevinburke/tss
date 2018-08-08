@@ -59,6 +59,7 @@ func (w *Writer) Write(p []byte) (int, error) {
 				}
 				w.buf.WriteString(s)
 				w.buf.WriteByte(' ')
+				w.lastLine = now
 			}
 			w.endOfLine = false
 		}
@@ -68,7 +69,6 @@ func (w *Writer) Write(p []byte) (int, error) {
 			wrote += idx + 1
 			pos += idx + 1
 			w.endOfLine = true
-			w.lastLine = now
 			if pos >= len(p) {
 				break
 			}
