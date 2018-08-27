@@ -16,9 +16,18 @@ type Writer struct {
 	endOfLine bool
 }
 
+var oldestStart time.Time
+
+func init() {
+	// This is as early as we can get into measuring when the binary starts.
+	oldestStart = time.Now()
+}
+
+// NewWriter creates a new Writer. If start is the zero value, the program's
+// start time will be used.
 func NewWriter(w io.Writer, start time.Time) *Writer {
 	if start.IsZero() {
-		start = time.Now()
+		start = oldestStart
 	}
 	return &Writer{w: w, start: start, endOfLine: true}
 }
