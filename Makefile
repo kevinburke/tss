@@ -2,7 +2,7 @@ SHELL = /bin/bash -o pipefail
 
 BENCHSTAT := $(GOPATH)/bin/benchstat
 BUMP_VERSION := $(GOPATH)/bin/bump_version
-MEGACHECK := $(GOPATH)/bin/megacheck
+STATICCHECK := $(GOPATH)/bin/staticcheck
 RELEASE := $(GOPATH)/bin/github-release
 WRITE_MAILMAP := $(GOPATH)/bin/write_mailmap
 UNAME = $(shell uname -s)
@@ -13,9 +13,9 @@ test:
 race-test: lint
 	go test -race ./...
 
-lint: | $(MEGACHECK)
+lint: | $(STATICCHECK)
 	go vet ./...
-	go list ./... | grep -v vendor | xargs $(MEGACHECK)
+	go list ./... | grep -v vendor | xargs $(STATICCHECK)
 
 bench: | $(BENCHSTAT)
 	go list ./... | grep -v vendor | xargs go test -benchtime=2s -bench=. -run='^$$' 2>&1 | $(BENCHSTAT) /dev/stdin
@@ -32,13 +32,8 @@ $(RELEASE):
 $(GOPATH)/bin:
 	mkdir -p $(GOPATH)/bin
 
-$(MEGACHECK): | $(GOPATH)/bin
-ifeq ($(UNAME),Darwin)
-	curl --silent --location --output $(MEGACHECK) https://github.com/kevinburke/go-tools/releases/download/2018-04-15/megacheck-darwin-amd64
-else
-	curl --silent --location --output $(MEGACHECK) https://github.com/kevinburke/go-tools/releases/download/2018-04-15/megacheck-linux-amd64
-endif
-	chmod +x $(MEGACHECK)
+$(STATICCHECK):
+	go get honnef.co/go/tools/cmd/staticcheck
 
 release: race-test | $(BUMP_VERSION) $(RELEASE)
 ifndef version
