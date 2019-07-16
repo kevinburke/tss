@@ -20,7 +20,7 @@ Annotate stdin with timestamps per line.
 	}
 }
 
-const Version = "0.5"
+const Version = "1.0"
 
 func main() {
 	version := flag.Bool("version", false, "Print the version string")
