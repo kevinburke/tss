@@ -114,6 +114,7 @@ var scalerTests = []struct {
 	{3*time.Minute + 4*time.Second + 100*time.Millisecond, "3m04s"},
 	{3*time.Minute + 14*time.Second + 100*time.Millisecond, "3m14s"},
 	{14*time.Second + 100*time.Millisecond, "14.10s"},
+	{2*time.Minute - 1*time.Microsecond, "2m00s"},
 	{0, "0.0ms"},
 }
 
