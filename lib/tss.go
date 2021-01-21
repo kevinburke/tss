@@ -103,11 +103,9 @@ func TimeScaler(d time.Duration) string {
 	case d == 0:
 		return "0.0ms"
 	case d >= time.Minute:
-		mins := (d + 30*time.Second) / time.Minute
+		d = time.Duration(int64((d+500*time.Millisecond)/time.Second)) * time.Second
+		mins := d / time.Minute
 		d = d - mins*time.Minute
-		if d < 0 {
-			d = 0 // can happen due to rounding
-		}
 		s := strconv.FormatFloat(float64(d.Nanoseconds())/1e9, 'f', 0, 64)
 		return strconv.Itoa(int(mins)) + "m" + fmt.Sprintf("%02s", s) + "s"
 	case d >= time.Second:
