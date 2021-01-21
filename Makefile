@@ -2,7 +2,6 @@ SHELL = /bin/bash -o pipefail
 
 BENCHSTAT := $(GOPATH)/bin/benchstat
 BUMP_VERSION := $(GOPATH)/bin/bump_version
-STATICCHECK := $(GOPATH)/bin/staticcheck
 RELEASE := $(GOPATH)/bin/github-release
 WRITE_MAILMAP := $(GOPATH)/bin/write_mailmap
 UNAME = $(shell uname -s)
@@ -10,12 +9,18 @@ UNAME = $(shell uname -s)
 test:
 	go test ./...
 
+ci-install:
+	curl -s https://packagecloud.io/install/repositories/meter/public/script.deb.sh | sudo bash
+	sudo apt-get -qq -o=Dpkg::Use-Pty=0 install staticcheck
+
+ci: lint race-test
+
 race-test: lint
 	go test -race ./...
 
-lint: | $(STATICCHECK)
+lint:
 	go vet ./...
-	go list ./... | grep -v vendor | xargs $(STATICCHECK)
+	staticcheck ./...
 
 bench: | $(BENCHSTAT)
 	go list ./... | grep -v vendor | xargs go test -benchtime=2s -bench=. -run='^$$' 2>&1 | $(BENCHSTAT) /dev/stdin
@@ -31,9 +36,6 @@ $(RELEASE):
 
 $(GOPATH)/bin:
 	mkdir -p $(GOPATH)/bin
-
-$(STATICCHECK):
-	go get honnef.co/go/tools/cmd/staticcheck
 
 release: race-test | $(BUMP_VERSION) $(RELEASE)
 ifndef version
