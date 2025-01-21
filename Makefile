@@ -10,13 +10,12 @@ test:
 	go test ./...
 
 ci-install:
-	curl -s https://packagecloud.io/install/repositories/meter/public/script.deb.sh | sudo bash
-	sudo apt-get -qq -o=Dpkg::Use-Pty=0 install staticcheck
+	go install honnef.co/go/tools/cmd/staticcheck@latest
 
 ci: lint race-test
 
 race-test: lint
-	go test -race ./...
+	go test -trimpath -race ./...
 
 lint:
 	go vet ./...
